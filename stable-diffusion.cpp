@@ -764,8 +764,6 @@ public:
                         int start_merge_step,
                         SDCondition id_cond) {
         size_t steps = sigmas.size() - 1;
-        // noise = load_tensor_from_file(work_ctx, "./rand0.bin");
-        // print_ggml_tensor(noise);
         struct ggml_tensor* x = ggml_dup_tensor(work_ctx, init_latent);
         copy_ggml_tensor(x, init_latent);
         x = denoiser->noise_scaling(sigmas[0], noise, x);
@@ -801,7 +799,6 @@ public:
             auto guidance_tensor = vector_to_ggml_tensor(work_ctx, guidance_vec);
 
             copy_ggml_tensor(noised_input, input);
-            // noised_input = noised_input * c_in
             ggml_tensor_scale(noised_input, c_in);
 
             std::vector<struct ggml_tensor*> controls;
@@ -809,8 +806,6 @@ public:
             if (control_hint != NULL) {
                 control_net->compute(n_threads, noised_input, control_hint, timesteps, cond.c_crossattn, cond.c_vector);
                 controls = control_net->controls;
-                // print_ggml_tensor(controls[12]);
-                // GGML_ASSERT(0);
             }
 
             if (start_merge_step == -1 || step <= start_merge_step) {
@@ -1290,8 +1285,6 @@ sd_image_t* generate_image(sd_ctx_t* sd_ctx,
         int start_merge_step = -1;
         if (sd_ctx->sd->stacked_id) {
             start_merge_step = int(sd_ctx->sd->pmid_model->style_strength / 100.f * sample_steps);
-            // if (start_merge_step > 30)
-            //     start_merge_step = 30;
             LOG_INFO("PHOTOMAKER: start_merge_step: %d", start_merge_step);
         }
 
@@ -1309,8 +1302,6 @@ sd_image_t* generate_image(sd_ctx_t* sd_ctx,
                                                      sigmas,
                                                      start_merge_step,
                                                      id_cond);
-        // struct ggml_tensor* x_0 = load_tensor_from_file(ctx, "samples_ddim.bin");
-        // print_ggml_tensor(x_0);
         int64_t sampling_end = ggml_time_ms();
         LOG_INFO("sampling completed, taking %.2fs", (sampling_end - sampling_start) * 1.0f / 1000);
         final_latents.push_back(x_0);
